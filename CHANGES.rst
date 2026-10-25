@@ -2,6 +2,11 @@
 Changes
 =======
 
+Not yet released
+----------------
+
+- Switch to trusted publisher release process with Django Commons.
+
 8.3.2 (2026-08-30)
 ------------------
 
