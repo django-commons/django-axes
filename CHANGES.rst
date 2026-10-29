@@ -36,6 +36,10 @@ Changes
 - Add Persion (fa) translations for django-axes.
   [AmirAli-BahramJerdi]
 - Add individual attempt expiry support.
+  This release adds the ``axes.0010_accessattemptexpiration`` migration.
+  Run ``python manage.py migrate`` after upgrading, also when
+  ``AXES_USE_ATTEMPT_EXPIRATION`` is off: deleting access attempts
+  needs the new table.
   [kuldeepkhatke]
 - Add checks for missing ip_address in lockout params.
   [shayanTaki]

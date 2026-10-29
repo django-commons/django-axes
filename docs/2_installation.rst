@@ -65,6 +65,8 @@ if you have any custom logic to override Django's standard permissions checks.
 **4.** Run ``python manage.py check`` to check the configuration.
 
 **5.** Run ``python manage.py migrate`` to sync the database.
+Run it again after each upgrade of django-axes. Axes expects all of its
+migrations to be applied, including the ones for features you do not use.
 
 Axes is now functional with the default settings and is saving user attempts
 into your database and locking users out if they exceed the maximum attempts.
