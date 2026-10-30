@@ -35,9 +35,9 @@ setup(
     package_dir={"axes": "axes"},
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    python_requires=">=3.10",
+    python_requires=">=3.11",
     install_requires=[
-        "django>=4.2",
+        "django>=5.2",
         "asgiref>=3.6.0",
     ],
     extras_require={
@@ -50,7 +50,6 @@ setup(
         "Environment :: Web Environment",
         "Environment :: Plugins",
         "Framework :: Django",
-        "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.2",
         "Framework :: Django :: 6.0",
         "Intended Audience :: Developers",
@@ -59,7 +58,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
