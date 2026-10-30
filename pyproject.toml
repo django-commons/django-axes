@@ -13,6 +13,7 @@ legacy_tox_ini = """
 envlist =
     py{311,312,313,314}-dj52
     py{312,313,314}-dj60
+    py{312,313,314}-dj61
     py314-djmain
     py314-djqa
 
@@ -27,6 +28,7 @@ python =
 DJANGO =
     5.2: dj52
     6.0: dj60
+    6.1: dj61
     main: djmain
     qa: djqa
 
@@ -36,6 +38,7 @@ deps =
     -r requirements.txt
     dj52: django>=5.2,<5.3
     dj60: django>=6.0,<6.1
+    dj61: django>=6.1,<6.2
     djmain: https://github.com/django/django/archive/main.tar.gz
 usedevelop = true
 commands = pytest
