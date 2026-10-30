@@ -140,14 +140,14 @@ class AxesTestCase(TestCase):
             reverse("admin:login"),
             post_data,
             REMOTE_ADDR=remote_addr or self.ip_address,
-            HTTP_USER_AGENT=self.user_agent,
+            headers={"user-agent": self.user_agent},
         )
 
     def logout(self):
         return self.client.post(
             reverse("admin:logout"),
             REMOTE_ADDR=self.ip_address,
-            HTTP_USER_AGENT=self.user_agent,
+            headers={"user-agent": self.user_agent},
         )
 
     def check_login(self):

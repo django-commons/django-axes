@@ -1,3 +1,4 @@
+from datetime import timedelta
 from io import StringIO
 from unittest.mock import patch, Mock
 
@@ -13,15 +14,15 @@ class ResetAccessLogsManagementCommandTestCase(AxesTestCase):
         self.msg_not_found = "No logs found.\n"
         self.msg_num_found = "{} logs removed.\n"
 
-        days_3 = timezone.now() - timezone.timedelta(days=3)
+        days_3 = timezone.now() - timedelta(days=3)
         with patch("django.utils.timezone.now", Mock(return_value=days_3)):
             AccessLog.objects.create()
 
-        days_13 = timezone.now() - timezone.timedelta(days=9)
+        days_13 = timezone.now() - timedelta(days=9)
         with patch("django.utils.timezone.now", Mock(return_value=days_13)):
             AccessLog.objects.create()
 
-        days_30 = timezone.now() - timezone.timedelta(days=27)
+        days_30 = timezone.now() - timedelta(days=27)
         with patch("django.utils.timezone.now", Mock(return_value=days_30)):
             AccessLog.objects.create()
 

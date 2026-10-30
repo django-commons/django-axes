@@ -1,3 +1,4 @@
+from datetime import timedelta
 from logging import getLogger
 from typing import List, Optional
 
@@ -68,7 +69,7 @@ class AxesDatabaseHandler(AbstractAxesHandler, AxesBaseHandler):
             count, _ = AccessLog.objects.all().delete()
             log.info("AXES: Reset all %d access logs from database.", count)
         else:
-            limit = timezone.now() - timezone.timedelta(days=age_days)
+            limit = timezone.now() - timedelta(days=age_days)
             count, _ = AccessLog.objects.filter(attempt_time__lte=limit).delete()
             log.info(
                 "AXES: Reset %d access logs older than %d days from database.",
@@ -83,7 +84,7 @@ class AxesDatabaseHandler(AbstractAxesHandler, AxesBaseHandler):
             count, _ = AccessFailureLog.objects.all().delete()
             log.info("AXES: Reset all %d access failure logs from database.", count)
         else:
-            limit = timezone.now() - timezone.timedelta(days=age_days)
+            limit = timezone.now() - timedelta(days=age_days)
             count, _ = AccessFailureLog.objects.filter(attempt_time__lte=limit).delete()
             log.info(
                 "AXES: Reset %d access failure logs older than %d days from database.",
@@ -167,7 +168,9 @@ class AxesDatabaseHandler(AbstractAxesHandler, AxesBaseHandler):
         try:
             post_data = get_query_str(request.POST).replace("\0", "0x00")
         except MultiPartParserError as ex:
-            post_data = f'Could not access "request.POST": {ex.__class__.__name__}: {ex}'
+            post_data = (
+                f'Could not access "request.POST": {ex.__class__.__name__}: {ex}'
+            )
 
         if self.is_whitelisted(request, credentials):
             log.info("AXES: Login failed from whitelisted client %s.", client_str)

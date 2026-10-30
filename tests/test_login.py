@@ -107,7 +107,7 @@ class DatabaseLoginTestCase(AxesTestCase):
             reverse("admin:login"),
             post_data,
             REMOTE_ADDR=ip_addr,
-            HTTP_USER_AGENT=user_agent,
+            headers={"user-agent": user_agent},
         )
 
     def _lockout_user_from_ip(self, username, ip_addr, user_agent="test-browser"):
