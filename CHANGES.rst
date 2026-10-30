@@ -2,15 +2,50 @@
 Changes
 =======
 
-Not yet released
-----------------
+9.0.0 (2026-10-30)
+------------------
+
+Breaking changes and upgrading
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Require Python 3.11 or newer and Django 5.2 or newer. Python 3.10 and
+  Django 4.2 are no longer supported.
+- Run ``python manage.py migrate`` after upgrading, even when
+  ``AXES_USE_ATTEMPT_EXPIRATION`` is disabled. The
+  ``axes.0010_accessattemptexpiration`` migration, introduced in 8.1.0, is
+  required when deleting access attempts. This release adds no new migrations.
+- Usernames longer than the Axes username field's maximum length are now
+  truncated consistently before logging and lockout lookups, including values
+  returned by ``AXES_USERNAME_CALLABLE``. Usernames with the same truncated
+  prefix share the same username-based lockout tracking.
+
+Features and fixes
+~~~~~~~~~~~~~~~~~~
 
 - Truncate usernames to the model field's maximum length before lockout lookups
   and failed-login logging to avoid database errors for oversized usernames.
-- Remove Python 3.10 and Django 4.2 support (EOL).
+- Fall back to the user model's ``USERNAME_FIELD`` when
+  ``AXES_USERNAME_FORM_FIELD`` is missing from credentials or request data,
+  preserving compatibility with Django's ``user_login_failed`` signal.
+- Redact passwords and other configured sensitive parameters submitted with a
+  Django form prefix, such as ``login-password``, before storing request data.
+- Fix asynchronous middleware lockout responses by passing the original
+  response and credentials in the correct argument order, including to custom
+  lockout callables.
+- Handle ``MultiPartParserError`` when reading POST data during failed-login
+  logging so malformed multipart requests do not prevent attempts being saved.
+- Calculate cooloff thresholds safely when no request is supplied or the
+  request has no ``axes_attempt_time`` attribute.
 - Add Django 6.1 support.
-- Switch to trusted publisher release process with Django Commons.
-- Switch from the Jazzband organization to Django Commons.
+- Include a PEP 561 ``py.typed`` marker so type checkers can use the package's
+  inline annotations.
+
+Project and packaging
+~~~~~~~~~~~~~~~~~~~~~
+
+- Move project maintenance and repository links from Jazzband to Django Commons.
+- Publish releases through PyPI trusted publishing and build distributions
+  using PEP 517.
 
 8.3.2 (2026-08-30)
 ------------------

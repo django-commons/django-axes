@@ -11,6 +11,7 @@ setup(
             open("CHANGES.rst", encoding="utf-8").read(),
         ]
     ),
+    long_description_content_type="text/x-rst",
     keywords="authentication django pci security",
     author=", ".join(
         [

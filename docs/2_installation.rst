@@ -80,6 +80,29 @@ Many people have different configurations for their development and production e
 and running the application with misconfigured settings can prevent security features from working.
 
 
+Version 9 breaking changes and upgrading from django-axes version 8
+-------------------------------------------------------------------
+
+Upgrade to Python 3.11 or newer and Django 5.2 or newer before installing
+django-axes 9.0. Python 3.10 and Django 4.2 are no longer supported.
+
+Run ``python manage.py migrate`` after upgrading, even if
+``AXES_USE_ATTEMPT_EXPIRATION`` is disabled. The
+``axes.0010_accessattemptexpiration`` migration introduced in 8.1.0 is required
+when deleting access attempts. Version 9.0 adds no new migrations.
+
+Usernames are now truncated to the Axes username field's maximum length before
+logging and lockout lookups, including usernames returned by
+``AXES_USERNAME_CALLABLE``. Usernames that share the same truncated prefix
+share username-based lockout tracking. Custom username callables should return
+identifiers that fit within this limit.
+
+When ``AXES_USERNAME_FORM_FIELD`` is missing from credentials or request data,
+Axes now falls back to the user model's ``USERNAME_FIELD``. Review custom
+authentication integrations that previously relied on a missing field producing
+no username.
+
+
 Version 8 breaking changes and upgrading from django-axes version 7
 -------------------------------------------------------------------
 
