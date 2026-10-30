@@ -5,6 +5,8 @@ Changes
 Not yet released
 ----------------
 
+- Truncate usernames to the model field's maximum length before lockout lookups
+  and failed-login logging to avoid database errors for oversized usernames.
 - Remove Python 3.10 and Django 4.2 support (EOL).
 - Add Django 6.1 support.
 - Switch to trusted publisher release process with Django Commons.

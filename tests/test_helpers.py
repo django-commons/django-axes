@@ -30,7 +30,7 @@ from axes.helpers import (
     set_retry_after_header,
     toggleable,
 )
-from axes.models import AccessAttempt
+from axes.models import AccessAttempt, AccessBase
 from tests.base import AxesTestCase
 
 
@@ -694,6 +694,66 @@ class ClientCacheKeyTestCase(AxesTestCase):
 
 
 class UsernameTestCase(AxesTestCase):
+    def test_get_client_username_respects_field_length_for_all_sources(self):
+        max_length = AccessBase._meta.get_field("username").max_length
+        for source in ("post", "data", "credentials", "callable", "import_string"):
+            for username in (
+                None,
+                "",
+                "short",
+                "x" * max_length,
+                "é" * (max_length + 1),
+            ):
+                with self.subTest(source=source, username=username):
+                    request = HttpRequest()
+                    credentials = None
+                    username_callable = None
+                    if source == "post":
+                        request.POST["username"] = username
+                    elif source == "data":
+                        request.data = {"username": username}
+                    elif source == "credentials":
+                        request.POST["username"] = "ignored"
+                        credentials = {"username": username}
+                    elif source == "callable":
+                        username_callable = lambda request, credentials: username
+                    else:
+                        username_callable = "tests.test_helpers.get_username"
+
+                    expected = username[:max_length] if username else username
+                    with (
+                        override_settings(AXES_USERNAME_CALLABLE=username_callable),
+                        patch("tests.test_helpers.get_username", return_value=username),
+                        patch("axes.helpers.log.warning") as warning,
+                    ):
+                        self.assertEqual(
+                            expected, get_client_username(request, credentials)
+                        )
+                    if username and len(username) > max_length:
+                        warning.assert_called_once_with(
+                            "AXES: Truncating username of length %s to %s characters to fit the database field.",
+                            len(username),
+                            max_length,
+                        )
+                    else:
+                        warning.assert_not_called()
+
+    def test_get_client_username_uses_dynamic_field_length(self):
+        field = AccessBase._meta.get_field("username")
+        with patch.object(field, "max_length", 8):
+            self.assertEqual(
+                "long-use",
+                get_client_username(HttpRequest(), {"username": "long-username"}),
+            )
+
+    @override_settings(AXES_USERNAME_FORM_FIELD="auth-username")
+    def test_get_client_username_truncates_fallback_field(self):
+        max_length = AccessBase._meta.get_field("username").max_length
+        self.assertEqual(
+            "x" * max_length,
+            get_client_username(HttpRequest(), {"username": "x" * (max_length + 1)}),
+        )
+
     @override_settings(AXES_USERNAME_FORM_FIELD="username")
     def test_default_get_client_username(self):
         expected = "test-username"
