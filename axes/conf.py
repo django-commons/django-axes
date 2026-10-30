@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.functional import SimpleLazyObject
@@ -9,11 +12,17 @@ class JSONSerializableLazyObject(SimpleLazyObject):
     Celery/Kombu config inspection may JSON-encode Django settings.
     Provide a JSON-friendly representation for lazy values.
 
-    Fixes jazzband/django-axes#1391
+    Fixes django-commons/django-axes#1391
     """
 
     def __json__(self):
         return str(self)
+
+
+@dataclass(frozen=True, order=True)
+class LockoutTier:
+    failures: int
+    cooloff: timedelta
 
 
 # disable plugin when set to False
@@ -108,6 +117,10 @@ settings.AXES_LOCKOUT_URL = getattr(settings, "AXES_LOCKOUT_URL", None)
 
 settings.AXES_COOLOFF_TIME = getattr(settings, "AXES_COOLOFF_TIME", None)
 
+# Progressive lockout tiers: list of LockoutTier(failures, cooloff) instances.
+# When set, overrides AXES_FAILURE_LIMIT and AXES_COOLOFF_TIME.
+settings.AXES_LOCKOUT_TIERS = getattr(settings, "AXES_LOCKOUT_TIERS", None)
+
 settings.AXES_USE_ATTEMPT_EXPIRATION = getattr(
     settings, "AXES_USE_ATTEMPT_EXPIRATION", False
 )
@@ -159,6 +172,11 @@ settings.AXES_CLIENT_STR_CALLABLE = getattr(settings, "AXES_CLIENT_STR_CALLABLE"
 
 # set the HTTP response code given by too many requests
 settings.AXES_HTTP_RESPONSE_CODE = getattr(settings, "AXES_HTTP_RESPONSE_CODE", 429)
+
+# If True, add a Retry-After header to lockout responses when a cool off is set
+settings.AXES_ENABLE_RETRY_AFTER_HEADER = getattr(
+    settings, "AXES_ENABLE_RETRY_AFTER_HEADER", False
+)
 
 # If True, a failed login attempt during lockout will reset the cool off period
 settings.AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = getattr(

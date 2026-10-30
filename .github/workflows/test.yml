@@ -33,10 +33,10 @@ jobs:
             django-version: '6.0'
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -46,7 +46,7 @@ jobs:
         echo "::set-output name=dir::$(pip cache dir)"
 
     - name: Cache
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key:
@@ -66,6 +66,7 @@ jobs:
         DJANGO: ${{ matrix.django-version }}
 
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         name: Python ${{ matrix.python-version }}
+        fail_ci_if_error: false

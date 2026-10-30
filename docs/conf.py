@@ -39,8 +39,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "django-axes"
-copyright = "2016, Jazzband"
-author = "Jazzband"
+copyright = "2026, Django Commons"
+author = "Django Commons"
 
 # The full version, including alpha/beta/rc tags.
 release = get_version("django-axes")
