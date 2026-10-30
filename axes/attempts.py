@@ -1,8 +1,9 @@
+from datetime import datetime
 from logging import getLogger
 from typing import Optional
 
 from django.http import HttpRequest
-from django.utils.timezone import datetime, now
+from django.utils.timezone import now
 
 from axes.helpers import get_cool_off
 

@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock, patch
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime, timedelta, timezone as dt_timezone
 from django.test import override_settings
 from django.utils import timezone
 from axes.handlers.database import AxesDatabaseHandler
@@ -10,7 +10,6 @@ from django.core.cache import cache
 from django.http import HttpRequest
 from django.http.multipartparser import MultiPartParserError
 from django.urls import reverse
-from django.utils.timezone import timedelta
 
 from axes.conf import settings
 from axes.handlers.proxy import AxesProxyHandler
@@ -275,7 +274,7 @@ class AxesDatabaseHandlerTestCase(AxesHandlerBaseTestCase):
     def test_handler_reset_logs_older_than_42_days(self):
         self.create_log()
 
-        then = timezone.now() - timezone.timedelta(days=90)
+        then = timezone.now() - timedelta(days=90)
         with patch("django.utils.timezone.now", return_value=then):
             self.create_log()
 
@@ -291,7 +290,7 @@ class AxesDatabaseHandlerTestCase(AxesHandlerBaseTestCase):
     def test_handler_reset_failure_logs_older_than_42_days(self):
         self.create_failure_log()
 
-        then = timezone.now() - timezone.timedelta(days=90)
+        then = timezone.now() - timedelta(days=90)
         with patch("django.utils.timezone.now", return_value=then):
             self.create_failure_log()
 
@@ -616,7 +615,7 @@ class AxesTestHandlerTestCase(AxesHandlerBaseTestCase):
         self.assertEqual(0, AxesProxyHandler.get_failures(self.request, {}))
 
 
-@override_settings(AXES_HANDLER="axes.handlers.database.AxesDatabaseHandler", AXES_COOLOFF_TIME=timezone.timedelta(seconds=10))
+@override_settings(AXES_HANDLER="axes.handlers.database.AxesDatabaseHandler", AXES_COOLOFF_TIME=timedelta(seconds=10))
 class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
     def setUp(self):
         super().setUp()
@@ -656,7 +655,7 @@ class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
         )
         dummy_attempt.expiration = AccessAttemptExpiration.objects.create(
             access_attempt=dummy_attempt,
-            expires_at=timezone.now() - timezone.timedelta(days=1)  # Set to expire in the past
+            expires_at=timezone.now() - timedelta(days=1)  # Set to expire in the past
         )
 
         count = self.handler.clean_expired_user_attempts(request=None, credentials=None)
@@ -683,7 +682,7 @@ class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
         )
         attempt_not_expired.expiration = AccessAttemptExpiration.objects.create(
             access_attempt=attempt_not_expired,
-            expires_at=timezone.now() + timezone.timedelta(days=1)  # Set to expire in the future
+            expires_at=timezone.now() + timedelta(days=1)  # Set to expire in the future
         )
 
         attempt_expired = AccessAttempt.objects.create(
@@ -694,7 +693,7 @@ class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
         )
         attempt_expired.expiration = AccessAttemptExpiration.objects.create(
             access_attempt=attempt_expired,
-            expires_at=timezone.now() - timezone.timedelta(days=1)  # Set to expire in the past
+            expires_at=timezone.now() - timedelta(days=1)  # Set to expire in the past
         )
 
         access_attempt_count = AccessAttempt.objects.count()
@@ -724,7 +723,7 @@ class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
         )
         attempt_not_expired_1.expiration = AccessAttemptExpiration.objects.create(
             access_attempt=attempt_not_expired_1,
-            expires_at=timezone.now() + timezone.timedelta(days=1)  # Set to expire in the future
+            expires_at=timezone.now() + timedelta(days=1)  # Set to expire in the future
         )
 
         attempt_not_expired_2 = AccessAttempt.objects.create(
@@ -735,7 +734,7 @@ class AxesDatabaseHandlerExpirationFlagTestCase(AxesTestCase):
         )
         attempt_not_expired_2.expiration = AccessAttemptExpiration.objects.create(
             access_attempt=attempt_not_expired_2,
-            expires_at=timezone.now() + timezone.timedelta(days=2)  # Set to expire in the future
+            expires_at=timezone.now() + timedelta(days=2)  # Set to expire in the future
         )
 
         access_attempt_count = AccessAttempt.objects.count()

@@ -5,6 +5,8 @@ Changes
 Not yet released
 ----------------
 
+- Remove Python 3.10 and Django 4.2 support (EOL).
+- Add Django 6.1 support.
 - Switch to trusted publisher release process with Django Commons.
 - Switch from the Jazzband organization to Django Commons.
 
