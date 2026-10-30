@@ -1,5 +1,5 @@
 # ترجمه فارسی برای django-axes
-# Copyright (C) 2025 jazzband
+# Copyright (C) 2025 django-commons
 # This file is distributed under the same license as the django-axes package.
 # AmirAli Bahramjerdi <amiralibahramjerdi@gmail.com>, 2025.
 #

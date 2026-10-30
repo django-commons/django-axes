@@ -2,6 +2,18 @@
 Changes
 =======
 
+Not yet released
+----------------
+
+- Switch to trusted publisher release process with Django Commons.
+- Switch from the Jazzband organization to Django Commons.
+
+8.3.2 (2026-08-30)
+------------------
+
+- Fix race condition in cache backend.
+  [aviseth]
+
 8.3.1 (2026-02-11)
 ------------------
 
@@ -81,7 +93,7 @@ Changes
 7.0.0 (2024-10-02)
 ------------------
 
-- Add support for dynamic cooloff time calculation from request. This is a breaking change. Please see `version 7 upgrade notes in the documentation <https://github.com/jazzband/django-axes/blob/4e89d72b92db044ff3f6b23ea2ab2e681211c98e/docs/2_installation.rst#version-7-breaking-changes-and-upgrading-from-django-axes-version-6>`_.
+- Add support for dynamic cooloff time calculation from request. This is a breaking change. Please see `version 7 upgrade notes in the documentation <https://github.com/django-commons/django-axes/blob/4e89d72b92db044ff3f6b23ea2ab2e681211c98e/docs/2_installation.rst#version-7-breaking-changes-and-upgrading-from-django-axes-version-6>`_.
   [browniebroke]
 
 

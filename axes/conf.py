@@ -12,7 +12,7 @@ class JSONSerializableLazyObject(SimpleLazyObject):
     Celery/Kombu config inspection may JSON-encode Django settings.
     Provide a JSON-friendly representation for lazy values.
 
-    Fixes jazzband/django-axes#1391
+    Fixes django-commons/django-axes#1391
     """
 
     def __json__(self):
