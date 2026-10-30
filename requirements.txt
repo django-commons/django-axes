@@ -3,7 +3,7 @@ black==26.10.1
 coverage==7.16.2
 django-ipware>=3
 mypy==2.4.0
-prospector==1.19.1
+prospector==1.20.0
 pytest-cov==7.1.0
 pytest-django==4.14.0
 pytest-subtests==0.15.0
