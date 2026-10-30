@@ -2,12 +2,12 @@
 django-axes
 ===========
 
-.. image:: https://jazzband.co/static/img/badge.svg
-   :target: https://jazzband.co/
-   :alt: Jazzband
+.. image:: https://img.shields.io/badge/Django%20Commons-Project-blue.svg
+   :target: https://github.com/django-commons/
+   :alt: Django Commons
 
-.. image:: https://img.shields.io/github/stars/jazzband/django-axes.svg?label=Stars&style=socialcA
-   :target: https://github.com/jazzband/django-axes
+.. image:: https://img.shields.io/github/stars/django-commons/django-axes.svg?label=Stars&style=socialcA
+   :target: https://github.com/django-commons/django-axes
    :alt: GitHub
 
 .. image:: https://img.shields.io/pypi/v/django-axes.svg
@@ -26,12 +26,12 @@ django-axes
    :target: https://django-axes.readthedocs.io/
    :alt: Documentation
 
-.. image:: https://github.com/jazzband/django-axes/workflows/Test/badge.svg
-   :target: https://github.com/jazzband/django-axes/actions
+.. image:: https://github.com/django-commons/django-axes/workflows/Test/badge.svg
+   :target: https://github.com/django-commons/django-axes/actions
    :alt: GitHub Actions
 
-.. image:: https://codecov.io/gh/jazzband/django-axes/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/jazzband/django-axes
+.. image:: https://codecov.io/gh/django-commons/django-axes/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/django-commons/django-axes
    :alt: Coverage
 
 
@@ -74,7 +74,7 @@ Issues
 
 If you have questions or have trouble using the app please file a bug report at:
 
-https://github.com/jazzband/django-axes/issues
+https://github.com/django-commons/django-axes/issues
 
 
 Contributing

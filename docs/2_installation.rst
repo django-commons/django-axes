@@ -89,7 +89,7 @@ Version 7 breaking changes and upgrading from django-axes version 6
 
 If you use ``settings.AXES_COOLOFF_TIME`` for configuring a callable that returns the cooloff time, it needs to accept at minimum a ``request`` argument of type ``HttpRequest`` from version 7 onwards. Example: ``AXES_COOLOFF_TIME = lambda request: timedelta(hours=2)`` (new call signature) instead of ``AXES_COOLOFF_TIME = lambda: timedelta(hours=2)`` (old cal signature). 
 
-Please see configuration documentation and `jazzband/django-axes#1222 <https://github.com/jazzband/django-axes/pull/1222>`_ for reference.
+Please see configuration documentation and `django-commons/django-axes#1222 <https://github.com/django-commons/django-axes/pull/1222>`_ for reference.
 
 
 Version 6 breaking changes and upgrading from django-axes version 5
