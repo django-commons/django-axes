@@ -202,6 +202,9 @@ def get_client_username(
     2. If given, use ``credentials`` and fetch username from ``AXES_USERNAME_FORM_FIELD`` (defaults to ``username``)
     3. Use request.POST and fetch username from ``AXES_USERNAME_FORM_FIELD`` (defaults to ``username``)
 
+    Truncate usernames to the maximum length of ``AccessBase.username`` so
+    database records and lockout lookups use the same value.
+
     :param request: incoming Django ``HttpRequest`` or similar object from authentication backend or other source
     :param credentials: incoming credentials ``dict`` or similar object from authentication backend or other source
     """
@@ -210,27 +213,38 @@ def get_client_username(
         log.debug("Using settings.AXES_USERNAME_CALLABLE to get username")
 
         if callable(settings.AXES_USERNAME_CALLABLE):
-            return settings.AXES_USERNAME_CALLABLE(  # pylint: disable=not-callable
+            username = settings.AXES_USERNAME_CALLABLE(  # pylint: disable=not-callable
                 request, credentials
             )
-        if isinstance(settings.AXES_USERNAME_CALLABLE, str):
-            return import_string(settings.AXES_USERNAME_CALLABLE)(request, credentials)
-        raise TypeError(
-            "settings.AXES_USERNAME_CALLABLE needs to be a string, callable, or None."
-        )
-
-    if credentials:
+        elif isinstance(settings.AXES_USERNAME_CALLABLE, str):
+            username = import_string(settings.AXES_USERNAME_CALLABLE)(
+                request, credentials
+            )
+        else:
+            raise TypeError(
+                "settings.AXES_USERNAME_CALLABLE needs to be a string, callable, or None."
+            )
+    elif credentials:
         log.debug(
             "Using parameter credentials to get username with key settings.AXES_USERNAME_FORM_FIELD"
         )
-        return get_username_from_data(credentials)  # type: ignore[return-value]
+        username = get_username_from_data(credentials)
+    else:
+        log.debug(
+            "Using parameter request.POST to get username with key settings.AXES_USERNAME_FORM_FIELD"
+        )
+        request_data = getattr(request, "data", request.POST)
+        username = get_username_from_data(request_data)
 
-    log.debug(
-        "Using parameter request.POST to get username with key settings.AXES_USERNAME_FORM_FIELD"
-    )
-
-    request_data = getattr(request, "data", request.POST)
-    return get_username_from_data(request_data)  # type: ignore[return-value]
+    max_length = AccessBase._meta.get_field("username").max_length
+    if isinstance(username, str) and len(username) > max_length:
+        log.warning(
+            "AXES: Truncating username of length %s to %s characters to fit the database field.",
+            len(username),
+            max_length,
+        )
+        username = username[:max_length]
+    return username  # type: ignore[return-value]
 
 
 def get_client_ip_address(

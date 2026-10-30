@@ -238,6 +238,23 @@ class ResetAttemptsTestCase(AxesHandlerBaseTestCase):
     AXES_ENABLE_ACCESS_FAILURE_LOG=True,
 )
 class AxesDatabaseHandlerTestCase(AxesHandlerBaseTestCase):
+    def test_user_login_failed_truncates_long_username(self):
+        max_length = AccessAttempt._meta.get_field("username").max_length
+        username = "x" * (max_length + 1)
+        self.request.POST["username"] = username
+
+        for _ in range(2):
+            AxesProxyHandler.user_login_failed(
+                sender=None, request=self.request, credentials={"username": username}
+            )
+
+        attempt = AccessAttempt.objects.get()
+        self.assertEqual(username[:max_length], attempt.username)
+        self.assertEqual(2, attempt.failures_since_start)
+        self.assertEqual(2, AccessFailureLog.objects.count())
+        for failure in AccessFailureLog.objects.all():
+            self.assertEqual(username[:max_length], failure.username)
+
     def test_handle_json_post_data(self):
         def _raise():
             raise MultiPartParserError("Invalid boundary in multipart: None")
