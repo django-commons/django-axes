@@ -7,6 +7,6 @@ prospector==1.20.0
 pytest-cov==7.1.0
 pytest-django==4.14.0
 pytest-subtests==0.15.0
-pytest==9.1.1
+pytest==9.2.0
 sphinx_rtd_theme==3.1.0
 tox==4.65.0
