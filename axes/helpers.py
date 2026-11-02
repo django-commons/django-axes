@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from hashlib import sha256
 from logging import getLogger
 from string import Template
-from typing import Callable, Optional, Type, Union, List
+from typing import Any, Callable, Optional, Type, Union, List, overload
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
@@ -23,6 +23,47 @@ try:
     IPWARE_INSTALLED = True
 except ImportError:
     IPWARE_INSTALLED = False
+
+
+@overload
+def resolve_callable(target: Any, error_message: str) -> Callable: ...  # noqa: E704
+
+
+@overload
+def resolve_callable(  # noqa: E704
+    target: Any, error_message: None = None
+) -> Optional[Callable]: ...  # noqa: E704
+
+
+def resolve_callable(
+    target: Any,
+    error_message: Optional[str] = None,
+) -> Optional[Callable]:
+    """
+    Resolve a callable from a callable object or an import path string.
+
+    :param target: A callable object, import string path, or None.
+    :param error_message: Optional error message to raise with TypeError if target is invalid.
+    :return: Resolved callable or None if target is None or cannot be resolved.
+    :raises TypeError: If target is not a callable or string (when error_message is provided).
+    """
+    if target is None:
+        if error_message:
+            raise TypeError(error_message)
+        return None
+
+    if callable(target):
+        return target
+
+    if isinstance(target, str):
+        func = import_string(target)
+        if callable(func):
+            return func
+
+    if error_message:
+        raise TypeError(error_message)
+
+    return None
 
 
 def get_cache() -> BaseCache:
@@ -77,11 +118,10 @@ def get_cool_off(request: Optional[HttpRequest] = None) -> Optional[timedelta]:
         return timedelta(hours=cool_off)
     if isinstance(cool_off, float):
         return timedelta(minutes=cool_off * 60)
-    if isinstance(cool_off, str):
-        cool_off_func = import_string(cool_off)
+
+    cool_off_func = resolve_callable(cool_off)
+    if cool_off_func is not None:
         return cool_off_func(request)
-    if callable(cool_off):
-        return cool_off(request)  # pylint: disable=not-callable
 
     return cool_off
 
@@ -211,19 +251,11 @@ def get_client_username(
 
     if settings.AXES_USERNAME_CALLABLE:
         log.debug("Using settings.AXES_USERNAME_CALLABLE to get username")
-
-        if callable(settings.AXES_USERNAME_CALLABLE):
-            username = settings.AXES_USERNAME_CALLABLE(  # pylint: disable=not-callable
-                request, credentials
-            )
-        elif isinstance(settings.AXES_USERNAME_CALLABLE, str):
-            username = import_string(settings.AXES_USERNAME_CALLABLE)(
-                request, credentials
-            )
-        else:
-            raise TypeError(
-                "settings.AXES_USERNAME_CALLABLE needs to be a string, callable, or None."
-            )
+        username_func = resolve_callable(
+            settings.AXES_USERNAME_CALLABLE,
+            "settings.AXES_USERNAME_CALLABLE needs to be a string, callable, or None.",
+        )
+        username = username_func(request, credentials)
     elif credentials:
         log.debug(
             "Using parameter credentials to get username with key settings.AXES_USERNAME_FORM_FIELD"
@@ -265,16 +297,11 @@ def get_client_ip_address(
 
     if settings.AXES_CLIENT_IP_CALLABLE:
         log.debug("Using settings.AXES_CLIENT_IP_CALLABLE to get client IP address")
-
-        if callable(settings.AXES_CLIENT_IP_CALLABLE):
-            return settings.AXES_CLIENT_IP_CALLABLE(  # pylint: disable=not-callable
-                request
-            )
-        if isinstance(settings.AXES_CLIENT_IP_CALLABLE, str):
-            return import_string(settings.AXES_CLIENT_IP_CALLABLE)(request)
-        raise TypeError(
-            "settings.AXES_CLIENT_IP_CALLABLE needs to be a string, callable, or None."
+        client_ip_func = resolve_callable(
+            settings.AXES_CLIENT_IP_CALLABLE,
+            "settings.AXES_CLIENT_IP_CALLABLE needs to be a string, callable, or None.",
         )
+        return client_ip_func(request)
 
     # Resolve using django-ipware from a configuration flag that can be set to False to explicitly disable
     # this is added to both enable or disable the branch when ipware is installed in the test environment
@@ -314,13 +341,9 @@ def get_lockout_parameters(
     request_or_attempt: Union[HttpRequest, AccessBase],
     credentials: Optional[dict] = None,
 ) -> List[Union[str, List[str]]]:
-    if callable(settings.AXES_LOCKOUT_PARAMETERS):
-        return settings.AXES_LOCKOUT_PARAMETERS(request_or_attempt, credentials)
-
-    if isinstance(settings.AXES_LOCKOUT_PARAMETERS, str):
-        return import_string(settings.AXES_LOCKOUT_PARAMETERS)(
-            request_or_attempt, credentials
-        )
+    lockout_params_func = resolve_callable(settings.AXES_LOCKOUT_PARAMETERS)
+    if lockout_params_func is not None:
+        return lockout_params_func(request_or_attempt, credentials)
 
     if isinstance(settings.AXES_LOCKOUT_PARAMETERS, list):
         return settings.AXES_LOCKOUT_PARAMETERS
@@ -432,18 +455,11 @@ def get_client_str(
 
     if settings.AXES_CLIENT_STR_CALLABLE:
         log.debug("Using settings.AXES_CLIENT_STR_CALLABLE to get client string.")
-
-        if callable(settings.AXES_CLIENT_STR_CALLABLE):
-            return settings.AXES_CLIENT_STR_CALLABLE(  # pylint: disable=not-callable
-                username, ip_address, user_agent, path_info, request
-            )
-        if isinstance(settings.AXES_CLIENT_STR_CALLABLE, str):
-            return import_string(settings.AXES_CLIENT_STR_CALLABLE)(
-                username, ip_address, user_agent, path_info, request
-            )
-        raise TypeError(
-            "settings.AXES_CLIENT_STR_CALLABLE needs to be a string, callable or None."
+        client_str_func = resolve_callable(
+            settings.AXES_CLIENT_STR_CALLABLE,
+            "settings.AXES_CLIENT_STR_CALLABLE needs to be a string, callable or None.",
         )
+        return client_str_func(username, ip_address, user_agent, path_info, request)
 
     client_dict = {}
 
@@ -528,12 +544,9 @@ def get_failure_limit(request: HttpRequest, credentials) -> int:
         sorted_tiers = sorted(tiers, key=lambda t: t.failures)
         return sorted_tiers[0].failures
 
-    if callable(settings.AXES_FAILURE_LIMIT):
-        return settings.AXES_FAILURE_LIMIT(  # pylint: disable=not-callable
-            request, credentials
-        )
-    if isinstance(settings.AXES_FAILURE_LIMIT, str):
-        return import_string(settings.AXES_FAILURE_LIMIT)(request, credentials)
+    failure_limit_func = resolve_callable(settings.AXES_FAILURE_LIMIT)
+    if failure_limit_func is not None:
+        return failure_limit_func(request, credentials)
     if isinstance(settings.AXES_FAILURE_LIMIT, int):
         return settings.AXES_FAILURE_LIMIT
     raise TypeError("settings.AXES_FAILURE_LIMIT needs to be a callable or an integer")
@@ -565,25 +578,15 @@ def get_lockout_response(
     credentials: Optional[dict] = None,
 ) -> HttpResponse:
     if settings.AXES_LOCKOUT_CALLABLE:
-        if callable(settings.AXES_LOCKOUT_CALLABLE):
-            # Try calling with 3 args, fallback to 2 for backward compatibility
-            try:
-                return settings.AXES_LOCKOUT_CALLABLE(
-                    request, original_response, credentials
-                )
-            except TypeError:
-                # Fallback: old signature without original_response
-                return settings.AXES_LOCKOUT_CALLABLE(request, credentials)
-        if isinstance(settings.AXES_LOCKOUT_CALLABLE, str):
-            callable_obj = import_string(settings.AXES_LOCKOUT_CALLABLE)
-            # Try calling with 3 args, fallback to 2 for backward compatibility
-            try:
-                return callable_obj(request, original_response, credentials)
-            except TypeError:
-                return callable_obj(request, credentials)
-        raise TypeError(
-            "settings.AXES_LOCKOUT_CALLABLE needs to be a string, callable, or None."
+        callable_obj = resolve_callable(
+            settings.AXES_LOCKOUT_CALLABLE,
+            "settings.AXES_LOCKOUT_CALLABLE needs to be a string, callable, or None.",
         )
+        # Try calling with 3 args, fallback to 2 for backward compatibility
+        try:
+            return callable_obj(request, original_response, credentials)
+        except TypeError:
+            return callable_obj(request, credentials)
 
     status = settings.AXES_HTTP_RESPONSE_CODE
     failures = getattr(request, "axes_failures_since_start", None) or 0
@@ -721,14 +724,11 @@ def is_user_attempt_whitelisted(
     whitelist_callable = settings.AXES_WHITELIST_CALLABLE
     if whitelist_callable is None:
         return False
-    if callable(whitelist_callable):
-        return whitelist_callable(request, credentials)  # pylint: disable=not-callable
-    if isinstance(whitelist_callable, str):
-        return import_string(whitelist_callable)(request, credentials)
-
-    raise TypeError(
-        "settings.AXES_WHITELIST_CALLABLE needs to be a string, callable, or None."
+    whitelist_func = resolve_callable(
+        whitelist_callable,
+        "settings.AXES_WHITELIST_CALLABLE needs to be a string, callable, or None.",
     )
+    return whitelist_func(request, credentials)
 
 
 def toggleable(func) -> Callable:
