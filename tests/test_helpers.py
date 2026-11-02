@@ -27,6 +27,7 @@ from axes.helpers import (
     is_ip_address_in_blacklist,
     is_ip_address_in_whitelist,
     is_user_attempt_whitelisted,
+    resolve_callable,
     set_retry_after_header,
     toggleable,
 )
@@ -1439,3 +1440,33 @@ class AxesLockoutTiersTestCase(AxesTestCase):
         data = json.loads(response.content)
         self.assertEqual(data["failure_count"], 3)
         self.assertIn("cooloff_time", data)
+
+
+class ResolveCallableTestCase(AxesTestCase):
+    def test_resolve_callable_none(self):
+        self.assertIsNone(resolve_callable(None))
+
+    def test_resolve_callable_function(self):
+        def sample_func():
+            pass
+
+        self.assertIs(resolve_callable(sample_func), sample_func)
+
+    def test_resolve_callable_import_string(self):
+        func = resolve_callable("tests.test_helpers.mock_get_cool_off_str")
+        self.assertIsNotNone(func)
+        self.assertEqual(func(HttpRequest()), timedelta(seconds=30))
+
+    def test_resolve_callable_invalid_target_no_error_message(self):
+        self.assertIsNone(resolve_callable(42))
+
+    def test_resolve_callable_invalid_target_with_error_message(self):
+        with self.assertRaises(TypeError) as ctx:
+            resolve_callable(42, "Must be callable")
+        self.assertIn("Must be callable", str(ctx.exception))
+
+    def test_resolve_callable_import_non_callable_with_error_message(self):
+        with self.assertRaises(TypeError) as ctx:
+            resolve_callable("axes.conf.settings", "Imported target must be callable")
+        self.assertIn("Imported target must be callable", str(ctx.exception))
+
