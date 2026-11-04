@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from hashlib import sha256
 from logging import getLogger
 from string import Template
-from typing import Callable, Optional, Type, Union, List
+from typing import Callable, Optional, Union, List
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
@@ -503,7 +503,7 @@ def cleanse_parameters(params: dict) -> dict:
     return params
 
 
-def get_query_str(query: Type[QueryDict], max_length: int = 1024) -> str:
+def get_query_str(query: QueryDict, max_length: int = 1024) -> str:
     """
     Turns a query dictionary into an easy-to-read list of key-value pairs.
 
