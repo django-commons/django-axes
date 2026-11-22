@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         python-version: ['3.11', '3.12', '3.13', '3.14']
         django-version: ['5.2', '6.0', '6.1']
@@ -29,26 +30,15 @@ jobs:
             django-version: '6.1'
 
     steps:
-    - uses: actions/checkout@v7
+    # Actions are pinned to a full-length commit SHA
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Get pip cache dir
-      id: pip-cache
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
-
-    - name: Cache
-      uses: actions/cache@v6
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key:
-          ${{ matrix.python-version }}-v1-${{ hashFiles('**/setup.py') }}
-        restore-keys: |
-          ${{ matrix.python-version }}-v1-
 
     - name: Install dependencies
       run: |
@@ -60,9 +50,3 @@ jobs:
         tox -v
       env:
         DJANGO: ${{ matrix.django-version }}
-
-    - name: Upload coverage
-      uses: codecov/codecov-action@v5
-      with:
-        name: Python ${{ matrix.python-version }}
-        fail_ci_if_error: false
