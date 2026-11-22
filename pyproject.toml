@@ -12,6 +12,7 @@ legacy_tox_ini = """
 [tox]
 envlist =
     py{311,312,313,314}-dj52
+    pypy311-dj52
     py{312,313,314}-dj60
     py{312,313,314,315}-dj61
     py314-djmain
@@ -24,6 +25,7 @@ python =
     3.13: py313
     3.14: py314
     3.15: py315
+    pypy-3.11: pypy311
 
 [gh-actions:env]
 DJANGO =
@@ -42,7 +44,10 @@ deps =
     dj61: django>=6.1,<6.2
     djmain: https://github.com/django/django/archive/main.tar.gz
 usedevelop = true
-commands = pytest
+commands =
+    !pypy311: pytest
+    # The test run fails on PyPy when coverage is measured
+    pypy311: pytest --no-cov
 setenv =
     PYTHONDONTWRITEBYTECODE=1
 # Django development version is allowed to fail the test matrix
