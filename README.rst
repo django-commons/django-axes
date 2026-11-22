@@ -30,10 +30,6 @@ django-axes
    :target: https://github.com/django-commons/django-axes/actions
    :alt: GitHub Actions
 
-.. image:: https://codecov.io/gh/django-commons/django-axes/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/django-commons/django-axes
-   :alt: Coverage
-
 
 Axes is a Django plugin for keeping track of suspicious
 login attempts for your Django based website
