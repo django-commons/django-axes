@@ -1,6 +1,72 @@
 [build-system]
-requires = ["setuptools>=84.2.1", "wheel", "setuptools_scm"]
+requires = ["setuptools>=84.2.1", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-axes"
+dynamic = ["version", "readme"]
+description = "Keep track of failed login attempts in Django-powered sites."
+authors = [
+    {name = "Josh VanderLinden"},
+    {name = "Philip Neustrom"},
+    {name = "Michael Blume"},
+    {name = "Alex Clark"},
+    {name = "Camilo Nova"},
+    {name = "Aleksi Häkli"},
+]
+maintainers = [
+    {name = "Django Commons", email = "django-commons-admins@googlegroups.com"},
+]
+keywords = ["authentication", "django", "pci", "security"]
+dependencies = [
+    "django>=5.2",
+    "asgiref>=3.6.0",
+]
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Environment :: Plugins",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Framework :: Django :: 6.1",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Internet :: Log Analysis",
+    "Topic :: Security",
+    "Topic :: System :: Logging",
+]
+
+[project.optional-dependencies]
+ipware = ["django-ipware>=3"]
+
+[project.urls]
+Homepage = "https://github.com/django-commons/django-axes"
+Documentation = "https://django-axes.readthedocs.io/"
+Changelog = "https://github.com/django-commons/django-axes/blob/master/CHANGES.rst"
+Issues = "https://github.com/django-commons/django-axes/issues"
+
+[tool.setuptools.packages.find]
+include = ["axes*"]
+
+[tool.setuptools.dynamic]
+# The changelog is shown after the README on PyPI
+readme = {file = ["README.rst", "CHANGES.rst"], content-type = "text/x-rst"}
+
+[tool.setuptools_scm]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
