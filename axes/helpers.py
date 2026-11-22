@@ -43,9 +43,9 @@ def resolve_callable(
     Resolve a callable from a callable object or an import path string.
 
     :param target: A callable object, import string path, or None.
-    :param error_message: Optional error message to raise with TypeError if target is invalid.
-    :return: Resolved callable or None if target is None or cannot be resolved.
-    :raises TypeError: If target is not a callable or string (when error_message is provided).
+    :param error_message: Optional message for the TypeError raised when target does not resolve.
+    :return: Resolved callable, or None if target does not resolve and error_message is not given.
+    :raises TypeError: If target does not resolve to a callable and error_message is given.
     """
     if target is None:
         if error_message:
@@ -119,8 +119,11 @@ def get_cool_off(request: Optional[HttpRequest] = None) -> Optional[timedelta]:
     if isinstance(cool_off, float):
         return timedelta(minutes=cool_off * 60)
 
-    cool_off_func = resolve_callable(cool_off)
-    if cool_off_func is not None:
+    if isinstance(cool_off, str) or callable(cool_off):
+        cool_off_func = resolve_callable(
+            cool_off,
+            "settings.AXES_COOLOFF_TIME needs to be a number, timedelta, string, callable, or None.",
+        )
         return cool_off_func(request)
 
     return cool_off
