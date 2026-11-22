@@ -13,7 +13,7 @@ legacy_tox_ini = """
 envlist =
     py{311,312,313,314}-dj52
     py{312,313,314}-dj60
-    py{312,313,314}-dj61
+    py{312,313,314,315}-dj61
     py314-djmain
     py314-djqa
 
@@ -23,6 +23,7 @@ python =
     3.12: py312
     3.13: py313
     3.14: py314
+    3.15: py315
 
 [gh-actions:env]
 DJANGO =
