@@ -1178,6 +1178,11 @@ class AxesCoolOffTestCase(AxesTestCase):
     def test_get_cool_off_callable(self):
         self.assertEqual(get_cool_off(), timedelta(seconds=30))
 
+    @override_settings(AXES_COOLOFF_TIME="axes.conf.settings")
+    def test_get_cool_off_path_not_callable(self):
+        with self.assertRaises(TypeError):
+            get_cool_off()
+
     @override_settings(AXES_COOLOFF_TIME="tests.test_helpers.mock_get_cool_off_str")
     def test_get_cool_off_path(self):
         self.assertEqual(get_cool_off(), timedelta(seconds=30))
@@ -1456,6 +1461,10 @@ class ResolveCallableTestCase(AxesTestCase):
         func = resolve_callable("tests.test_helpers.mock_get_cool_off_str")
         self.assertIsNotNone(func)
         self.assertEqual(func(HttpRequest()), timedelta(seconds=30))
+
+    def test_resolve_callable_none_with_error_message(self):
+        with self.assertRaises(TypeError):
+            resolve_callable(None, "Must be callable")
 
     def test_resolve_callable_invalid_target_no_error_message(self):
         self.assertIsNone(resolve_callable(42))
