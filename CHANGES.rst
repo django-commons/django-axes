@@ -2,6 +2,21 @@
 Changes
 =======
 
+9.1.0 (2026-11-22)
+------------------
+
+- Add Python 3.15 support.
+- Add PyPy 3.11 support.
+- Raise a ``TypeError`` that names the setting when ``AXES_COOLOFF_TIME``
+  is an import path to an object that is not callable.
+- Resolve the settings that take a callable or an import path with one
+  shared helper, ``axes.helpers.resolve_callable`` (#1068, #1528, #1539).
+  [Fire162]
+- Annotate the ``query`` argument of ``axes.helpers.get_query_str`` as a
+  ``QueryDict`` instance instead of the class, so that type checkers accept
+  ``request.GET`` and ``request.POST`` (#1530).
+  [ayang-certego]
+
 9.0.0 (2026-10-30)
 ------------------
 
