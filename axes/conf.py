@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from datetime import timedelta
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
+
+# Kept importable from axes.conf for backwards compatibility.
+from axes.tiers import LockoutTier  # noqa: F401  # pylint: disable=unused-import
 
 
 class JSONSerializableLazyObject(SimpleLazyObject):
@@ -17,12 +17,6 @@ class JSONSerializableLazyObject(SimpleLazyObject):
 
     def __json__(self):
         return str(self)
-
-
-@dataclass(frozen=True, order=True)
-class LockoutTier:
-    failures: int
-    cooloff: timedelta
 
 
 # disable plugin when set to False

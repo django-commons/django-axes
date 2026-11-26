@@ -2,6 +2,15 @@
 Changes
 =======
 
+Unreleased
+----------
+
+- Import ``LockoutTier`` from ``axes.tiers`` in settings modules.
+  Importing it from ``axes.conf``, as the documentation showed, made axes
+  read the settings before they were loaded, so every ``AXES_*`` default
+  was missing and Django failed to start (#1544).
+  ``axes.conf.LockoutTier`` still works outside of settings.
+
 9.1.0 (2026-11-22)
 ------------------
 
